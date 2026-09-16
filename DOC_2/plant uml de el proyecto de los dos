@@ -1,0 +1,120 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam monochrome false
+skinparam shadowing false
+
+title EcoTech Solutions - Modelo Unificado Superior (UML)
+
+class Rol {
+    - nombre: String
+    - descripcion: String
+}
+
+class Usuario {
+    - id: int
+    - username: String
+    - passwordHash: String
+    + iniciarSesion(): Boolean
+    + cerrarSesion(): void
+    + autenticar(password: String): Boolean
+    + cambiarPassword(passwordNueva: String): void
+    + obtenerPermisos(): List<String>
+}
+
+class Empleado {
+    - id_empleado: int
+    - nombre: String
+    - direccion: String
+    - telefono: String
+    - correo: String
+    - fechaContrato: date
+    - salario: float
+    + actualizarDatos(): void
+    + registrarEmpleado(): void
+    + registrarHoras(): void
+}
+
+class Departamento {
+    - nombre: String
+    + creacionDepartamento(): void
+    + editarDepartamento(): void
+    + busquedaDepartamento(): Departamento
+    + eliminacionDepartamento(): void
+    + agregarEmpleado(empleado: Empleado): void
+    + removerEmpleado(empleado: Empleado): void
+    + asignarGerente(gerente: Empleado): void
+}
+
+class Proyecto {
+    - nombre: String
+    - descripcion: String
+    - fechaInicio: date
+    + crearProyecto(): void
+    + editarProyecto(): void
+    + eliminacionProyecto(): void
+    + asignarEmpleado(empleado: Empleado): void
+    + desasignarEmpleado(empleado: Empleado): void
+}
+
+class RegistroTiempo {
+    - horasTrabajadas: float
+    - fecha: date
+    - descripcionTrabajo: String
+    + registrarTiempo(): RegistroTiempo
+    + validarRegistro(): Boolean
+    + actualizarRegistro(): void
+}
+
+abstract class Informe {
+    - titulo: String
+    - fechaGeneracion: date
+    + generar(): void
+}
+
+class InformeEmpleados {
+    + generar(): void
+}
+
+class InformeProyectos {
+    + generar(): void
+}
+
+class InformeDepartamento {
+    + generar(): void
+}
+
+class InformeRegistroTiempo {
+    + generar(): void
+}
+
+class GestorInformes {
+    + generarInforme(tipo: String): Informe
+    + exportarInforme(informe: Informe, formato: String): File
+}
+
+' --- RELACIONES Y HERENCIA ---
+
+' Herencia
+Usuario <|-- Empleado : es un
+Informe <|-- InformeEmpleados
+Informe <|-- InformeProyectos
+Informe <|-- InformeDepartamento
+Informe <|-- InformeRegistroTiempo
+
+' Asociaciones y Multiplicidades
+Usuario "1..*" --> "1" Rol : posee
+Departamento "1" o-- "0..1" Empleado : gerente
+Departamento "1" *-- "1..*" Empleado : trabaja
+Empleado "1..*" -- "0..*" Proyecto : participa / desarrolla
+
+' Composición y Dependencias
+Proyecto "1" *-- "0..*" RegistroTiempo : contiene
+Empleado "1" -- "0..*" RegistroTiempo : registra
+
+GestorInformes ..> Informe : consulta / gestiona
+GestorInformes ..> Departamento : consulta
+GestorInformes ..> Empleado : consulta
+GestorInformes ..> Proyecto : consulta
+GestorInformes ..> RegistroTiempo : consulta
+
+@enduml
